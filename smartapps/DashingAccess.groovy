@@ -38,6 +38,7 @@ preferences {
         input "switches", "capability.switch", title: "Which switches?", multiple: true, required: false
         input "temperatures", "capability.temperatureMeasurement", title: "Which temperature sensors?", multiple: true, required: false
         input "humidities", "capability.relativeHumidityMeasurement", title: "Which humidity sensors?", multiple: true, required: false
+        input "thermostats", "capability.thermostat", title: "Which thermostats?", multiple: true, required: false
 
     }
 }
@@ -122,6 +123,11 @@ mappings {
             GET: "getWeather"
         ]
     }
+    path("/thermostat") {
+        action: [
+            GET: "getThermostat"
+        ]
+    }
 }
 
 
@@ -151,6 +157,7 @@ def initialize() {
         "switch": [:],
         "temperature": [:],
         "humidity": [:],
+        "thermostat": [:],
 
         ]
 
@@ -164,7 +171,9 @@ def initialize() {
     subscribe(dimmers, "level", dimmerHandler)
     subscribe(switches, "switch", switchHandler)
     subscribe(temperatures, "temperature", temperatureHandler)
-    subscribe(humidities, "humidity", humidityHandler)
+    subscribe(humidities, "humidity", humidityHandler) 
+    subscribe(thermostats, "temperature", thermostatTempHandler) 
+    subscribe(thermostats, "temperatureSetpoint", thermostatSetpointHandler) 
 
 }
 
@@ -624,6 +633,61 @@ def getWeather() {
         feature = "conditions"
     }
     return getWeatherFeature(feature)
+}
+
+//
+// Thermostats
+//
+def getThermostat() {
+    def deviceId = request.JSON?.deviceId
+    log.debug "getThermostat ${deviceId}"
+
+    if (deviceId) {
+        registerWidget("thermostat", deviceId, request.JSON?.widgetId)
+
+        def whichThermostat = thermostats.find { it.displayName == deviceId }
+        if (!whichThermostat) {
+            return respondWithStatus(404, "Device '${deviceId}' not found.")
+        } else {
+            return [
+                "deviceId": deviceId,
+                "temperature": whichThermostat.currentThermostat]
+        }
+    }
+
+    def result = [:]
+    thermostats.each {
+        result[it.displayName] = [
+            "temperature": it.currentThermostat,
+            "widgetId": state.widgets.thermostat[it.displayName]]}
+
+    return result
+}
+
+def postThermostat() {
+    def command = request.JSON?.command
+    def deviceId = request.JSON?.deviceId
+    log.debug "postThermostat ${deviceId}, ${command}"
+
+    if (command && deviceId) {
+        def whichThermostat = thermostats.find { it.displayName == deviceId }
+        if (!whichThermostat) {
+            return respondWithStatus(404, "Device '${deviceId}' not found.")
+        } else {
+            whichThermostat."$command"()
+        }
+    }
+    return respondWithSuccess()
+}
+
+def thermostatTempHandler(evt) {
+    def widgetId = state.widgets.thermostat[evt.displayName]
+    notifyWidget(widgetId, ["temperature": evt.value])
+}
+
+def thermostatSetpointHandler(evt) {
+    def widgetId = state.widgets.thermostat[evt.displayName]
+    notifyWidget(widgetId, ["setpoint": evt.value])
 }
 
 
