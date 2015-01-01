@@ -1,7 +1,7 @@
 // ----------------------------------------------------------------------------
-// Widget-sttemp styles
+// Widget-stthermostat styles
 // ----------------------------------------------------------------------------
-.widget-sttemp {
+.widget-stthermostat {
 
   .title {
     color: #fff;
@@ -9,33 +9,41 @@
 
   .temperature {
   	color: #00aaff;
-   	font-size: 380%;
+   	font-size: 300%;
   	font-weight: 400;
     display: inline-block;
-    vertical-align: middle;
+    vertical-align:bottom;
   	padding: 0;
   	margin-left: 10px;
   	margin-right: 10px;
   	margin-top: 0px;
-  	margin-bottom: 0px;
+  	margin-bottom: 20px;
   }
 
   .unit {
     color: #00aaff;
-    font-size: 250%;
+    font-size: 200%;
     font-weight: 400;
     display: inline-block;
-    vertical-align: top;
+    vertical-align:bottom;
     margin-left: 0px;
   	margin-right: 10px;
-    margin-top: 20px;
-  	margin-bottom: 0px;
+  	margin-bottom: 20px;
   }
 
-  .setpoint {
+ .slider {
+ }
+
+ .setpoint {
     display: inline-block;
-    margin-bottom: 5px;
+	position: absolute;
+	text-align: center;
+	margin-left: -5px;
+    bottom: 0px;
+    font-size: 25px;
+    vertical-align: bottom;
     color: rgba(255, 255, 255, 0.7);
+	padding-right: 100px;
   }
 
   .secondary-icon {
