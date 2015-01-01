@@ -42,7 +42,7 @@ class Dashing.Stthermostat extends Dashing.ClickableWidget
   setpointDown: ->
     newSetpoint = @minusSetpoint()
     $.post '/smartthings/dispatch',
-      deviceType: 'dimmerSetpoint',
+      deviceType: 'thermostatSetpoint',
       deviceId: @get('device'),
       setpoint: newSetpoint,
       (data) =>
