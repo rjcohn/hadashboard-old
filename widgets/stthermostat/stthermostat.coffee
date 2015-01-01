@@ -8,7 +8,7 @@ class Dashing.Stthermostat extends Dashing.ClickableWidget
     set: (key, value) -> @_temperature = value
 
   @accessor 'setpoint',
-    get: -> console.log('hi'); if @_setpoint then Math.floor(@_setpoint) else 0
+    get: -> console.log('sp=' + @_setpoint); if @_setpoint then Math.floor(@_setpoint) else 0
     set: (key, value) -> @_setpoint = value
 
   plusSetpoint: ->
