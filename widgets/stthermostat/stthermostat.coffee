@@ -1,4 +1,4 @@
-class Dashing.Stthermostat extends Dashing.Widget
+class Dashing.Stthermostat extends Dashing.ClickableWidget
   constructor: ->
     super
     @queryState()
@@ -10,6 +10,43 @@ class Dashing.Stthermostat extends Dashing.Widget
   @accessor 'setpoint',
     get: -> if @_setpoint then Math.floor(@_setpoint) else 0
     set: (key, value) -> @_setpoint = value
+
+  plusSetpoint: ->
+    newSetpoint = parseInt(@get('setpoint'))+1
+    if newSetpoint == 1
+      newSetpoint = 0
+    else if newSetpoint > 90
+      newSetpoint = 90
+    @set 'setpoint', newSetpoint
+    return @get('setpoint')
+
+  minusSetpoint: ->
+    newSetpoint = parseInt(@get('setpoint'))-1
+    if newSetpoint == -1
+      newSetpoint = 0
+    else if newSetpoint < 50
+      newSetpoint = 50
+    @set 'setpoint', newSetpoint
+    return @get('setpoint')
+
+  setpointUp: ->
+    newSetpoint = @plusSetpoint()
+    $.post '/smartthings/dispatch',
+      deviceType: 'thermostatSetpoint',
+      deviceId: @get('device'),
+      setpoint: newSetpoint,
+      (data) =>
+        json = JSON.parse data
+
+
+  setpointDown: ->
+    newSetpoint = @minusSetpoint()
+    $.post '/smartthings/dispatch',
+      deviceType: 'dimmerSetpoint',
+      deviceId: @get('device'),
+      setpoint: newSetpoint,
+      (data) =>
+        json = JSON.parse data
 
   queryState: ->
     $.get '/smartthings/dispatch',
@@ -26,4 +63,8 @@ class Dashing.Stthermostat extends Dashing.Widget
   onData: (data) ->
 
   onClick: (event) ->
+    if event.target.id == "setpoint-down"
+      @setpointDown()
+    else if event.target.id == "setpoint-up"
+      @setpointUp()
   

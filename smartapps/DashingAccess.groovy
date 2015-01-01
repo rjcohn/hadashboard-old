@@ -128,6 +128,11 @@ mappings {
             GET: "getThermostat"
         ]
     }
+    path("/thermostatSetpoint") {
+        action: [
+            POST: "thermostatSetpoint"
+        ]
+    }
 }
 
 
@@ -642,6 +647,14 @@ def getSetpoint(thermostat) {
 	return thermostat.currentThermostatMode == "cool" ? thermostat.currentCoolingSetpoint : thermostat.currentHeatingSetpoint
 }
 
+def setSetpoint(thermostat, temp) {
+	if (thermostat.currentThermostatMode == "cool") {
+		thermostat.setCoolingSetpoint(temp)
+	} else {
+		thermostat.setHeatingSetpoint(temp)
+	}
+}
+
 def getThermostat() {
     def deviceId = request.JSON?.deviceId
     log.debug "getThermostat ${deviceId}"
@@ -681,6 +694,22 @@ def postThermostat() {
             return respondWithStatus(404, "Device '${deviceId}' not found.")
         } else {
             whichThermostat."$command"()
+        }
+    }
+    return respondWithSuccess()
+}
+
+def thermostatSetpoint() {
+    def setpoint = request.JSON?.setpoint
+    def deviceId = request.JSON?.deviceId
+    log.debug "thermostatSetpoint ${deviceId}, ${setpoint}"
+    setpoint = setpoint.toInteger()
+    if (setpoint && deviceId) {
+        def whichThermostat = thermostats.find { it.displayName == deviceId }
+        if (!whichThermostat) {
+            return respondWithStatus(404, "Device '${deviceId}' not found.")
+        } else {
+            setSetpoint(whichThermostat, setpoint)
         }
     }
     return respondWithSuccess()
