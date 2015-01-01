@@ -14,7 +14,7 @@ class Dashing.Stthermostat extends Dashing.Widget
   queryState: ->
     $.get '/smartthings/dispatch',
       widgetId: @get('id'),
-      deviceType: 'thermostat,
+      deviceType: 'thermostat',
       deviceId: @get('device')
       (data) =>
         json = JSON.parse data
