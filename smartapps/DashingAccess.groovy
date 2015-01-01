@@ -173,7 +173,7 @@ def initialize() {
     subscribe(temperatures, "temperature", temperatureHandler)
     subscribe(humidities, "humidity", humidityHandler) 
     subscribe(thermostats, "temperature", thermostatTempHandler) 
-    subscribe(thermostats, "temperatureSetpoint", thermostatSetpointHandler) 
+    subscribe(thermostats, "thermostatSetpoint", thermostatSetpointHandler) 
 
 }
 
@@ -638,6 +638,10 @@ def getWeather() {
 //
 // Thermostats
 //
+def getSetpoint(thermostat) {
+	return thermostat.currentThermostatMode == "cool" ? thermostat.currentCoolingSetpoint : thermostat.currentHeatingSetpoint
+}
+
 def getThermostat() {
     def deviceId = request.JSON?.deviceId
     log.debug "getThermostat ${deviceId}"
@@ -651,14 +655,16 @@ def getThermostat() {
         } else {
             return [
                 "deviceId": deviceId,
-                "temperature": whichThermostat.currentThermostat]
+                "temperature": whichThermostat.currentTemperature,
+				"setpoint": getSetpoint(whichThermostat)]
         }
     }
 
     def result = [:]
     thermostats.each {
         result[it.displayName] = [
-            "temperature": it.currentThermostat,
+            "temperature": it.currentTemperature,
+            "setpoint": getSetpoint(it),
             "widgetId": state.widgets.thermostat[it.displayName]]}
 
     return result
