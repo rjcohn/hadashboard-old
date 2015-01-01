@@ -4,7 +4,7 @@ class Dashing.Stthermostat extends Dashing.ClickableWidget
     @queryState()
 
   @accessor 'temperature',
-	get: -> if @_temperature then Math.floor(@_temperature) else 0
+    get: -> if @_temperature then Math.floor(@_temperature) else 0
     set: (key, value) -> @_temperature = value
 
   @accessor 'setpoint',
