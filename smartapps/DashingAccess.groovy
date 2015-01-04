@@ -644,6 +644,7 @@ def getWeather() {
 // Thermostats
 //
 def getSetpoint(thermostat) {
+    // thermostatSetpoint returns an error (for ecobee) so get cooling or heating setpoint
 	return thermostat.currentThermostatMode == "cool" ? thermostat.currentCoolingSetpoint : thermostat.currentHeatingSetpoint
 }
 
@@ -717,14 +718,24 @@ def thermostatSetpoint() {
 
 def thermostatTempHandler(evt) {
     def widgetId = state.widgets.thermostat[evt.displayName]
-    notifyWidget(widgetId, ["temperature": evt.value])
+    def value = getFirstNumber(evt.value)
+    if (value != "")
+        notifyWidget(widgetId, ["temperature": value])
 }
 
 def thermostatSetpointHandler(evt) {
     def widgetId = state.widgets.thermostat[evt.displayName]
-    notifyWidget(widgetId, ["setpoint": evt.value])
+    def value = getFirstNumber(evt.value)
+    if (value != "")
+        notifyWidget(widgetId, ["setpoint": value])
 }
 
+def getFirstNumber(v) {
+    return v.replaceAll("[^0-9.]", "")
+    // regex doesn't work
+    //def m = (v =~ /\D*(\d+).*/)
+    //return m.matches() ? m[0][1] : ""
+}
 
 //
 // Widget Helpers
