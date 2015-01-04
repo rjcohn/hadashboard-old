@@ -4,11 +4,11 @@ class Dashing.Stthermostat extends Dashing.ClickableWidget
     @queryState()
 
   @accessor 'temperature',
-    get: -> if @_temperature then Math.floor(@_temperature) else 0
+    get: -> if @_temperature then Math.round(@_temperature) else 0
     set: (key, value) -> @_temperature = value
 
   @accessor 'setpoint',
-    get: -> console.log('sp=' + @_setpoint); if @_setpoint then Math.floor(@_setpoint) else 0
+    get: -> console.log('sp=' + @_setpoint); if @_setpoint then Math.round(@_setpoint) else 0
     set: (key, value) -> console.log('set ' + key + '=' + value); @_setpoint = value
 
   plusSetpoint: ->
